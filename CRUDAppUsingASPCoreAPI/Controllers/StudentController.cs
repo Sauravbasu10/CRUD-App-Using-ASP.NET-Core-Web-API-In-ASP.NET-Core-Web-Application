@@ -94,7 +94,23 @@ namespace CRUDAppUsingASPCoreAPI.Controllers
                 return View(std);
             }
         }
+        [HttpGet]
+        public IActionResult Details(int id)
+        {
+            Student std = new Student();
+            HttpResponseMessage response = client.GetAsync(url + id).Result;
+            if (response.IsSuccessStatusCode)
+            {
+                string result = response.Content.ReadAsStringAsync().Result;
+                var data = JsonConvert.DeserializeObject<Student>(result);
+                if (data != null)
+                {
+                    std = data;
+                }
 
+            }
+            return View(std);
+        }
         [HttpGet]
         public IActionResult Delete(int id)
         {

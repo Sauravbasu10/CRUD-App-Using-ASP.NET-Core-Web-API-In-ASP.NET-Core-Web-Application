@@ -71,8 +71,8 @@ namespace ASPCoreWebAPICRUD.Controllers
         public async Task<ActionResult<Student>> DeleteStudent(int id)
         {
             var std = await context.Students.FindAsync(id);
-            if(std == null)
-                {
+            if (std == null)
+            {
                 return NotFound();
             }
 
