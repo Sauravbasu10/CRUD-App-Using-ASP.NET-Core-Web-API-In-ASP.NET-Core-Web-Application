@@ -6,25 +6,25 @@ namespace CRUDAppUsingASPCoreAPI.Controllers
 {
     public class StudentController : Controller
     {
-        private readonly string url;
+        private readonly string url = "https://localhost:7178/api/StudentAPI/";
         private static readonly HttpClient client = new HttpClient();
 
-        public StudentController(IConfiguration configuration)
-        {
-            url = configuration["ApiSettings:BaseUrl"] ?? throw new ArgumentNullException("ApiSettings:BaseUrl is missing");
-        }
-
         [HttpGet]
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
             List<Student> students = new List<Student>();
-            HttpResponseMessage response = await client.GetAsync(url);
+            HttpResponseMessage response = client.GetAsync(url).Result;
+
             if (response.IsSuccessStatusCode)
             {
-                string result = await response.Content.ReadAsStringAsync();
+                string result = response.Content.ReadAsStringAsync().Result;
                 var data = JsonConvert.DeserializeObject<List<Student>>(result);
-                students = data ?? new List<Student>();
+                if (data != null)
+                {
+                    students = data;
+                }
             }
+
             return View(students);
         }
 
@@ -35,11 +35,13 @@ namespace CRUDAppUsingASPCoreAPI.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(Student std)
+        public IActionResult Create(Student std)
         {
             string data = JsonConvert.SerializeObject(std);
             StringContent content = new StringContent(data, Encoding.UTF8, "application/json");
-            HttpResponseMessage response = await client.PostAsync(url, content);
+
+            HttpResponseMessage response = client.PostAsync(url, content).Result;
+
             if (response.IsSuccessStatusCode)
             {
                 TempData["insert_message"] = "Student added successfully.";
@@ -47,35 +49,39 @@ namespace CRUDAppUsingASPCoreAPI.Controllers
             }
             else
             {
-                string error = await response.Content.ReadAsStringAsync();
+                string error = response.Content.ReadAsStringAsync().Result;
                 ModelState.AddModelError("", "Failed to create student: " + error);
                 return View(std);
             }
         }
 
         [HttpGet]
-        public async Task<IActionResult> Edit(int id)
+        public IActionResult Edit(int id)
         {
             Student std = new Student();
-            HttpResponseMessage response = await client.GetAsync(url + id);
-            if (response.IsSuccessStatusCode)
+            HttpResponseMessage response = client.GetAsync(url + id).Result;
+            if(response.IsSuccessStatusCode)
             {
-                string result = await response.Content.ReadAsStringAsync();
+                string result = response.Content.ReadAsStringAsync().Result;
                 var data = JsonConvert.DeserializeObject<Student>(result);
                 if (data != null)
                 {
                     std = data;
                 }
+           
             }
             return View(std);
         }
 
+
         [HttpPost]
-        public async Task<IActionResult> Edit(Student std)
+        public IActionResult Edit(Student std)
         {
             string data = JsonConvert.SerializeObject(std);
             StringContent content = new StringContent(data, Encoding.UTF8, "application/json");
-            HttpResponseMessage response = await client.PutAsync(url + std.id, content);
+
+            HttpResponseMessage response = client.PutAsync(url + std.id, content).Result;
+
             if (response.IsSuccessStatusCode)
             {
                 TempData["update_message"] = "Student updated successfully.";
@@ -83,39 +89,43 @@ namespace CRUDAppUsingASPCoreAPI.Controllers
             }
             else
             {
-                string error = await response.Content.ReadAsStringAsync();
+                string error = response.Content.ReadAsStringAsync().Result;
                 ModelState.AddModelError("", "Failed to update student: " + error);
                 return View(std);
             }
         }
 
         [HttpGet]
-        public async Task<IActionResult> Delete(int id)
+        public IActionResult Delete(int id)
         {
             Student std = new Student();
-            HttpResponseMessage response = await client.GetAsync(url + id);
+            HttpResponseMessage response = client.GetAsync(url + id).Result;
             if (response.IsSuccessStatusCode)
             {
-                string result = await response.Content.ReadAsStringAsync();
+                string result = response.Content.ReadAsStringAsync().Result;
                 var data = JsonConvert.DeserializeObject<Student>(result);
                 if (data != null)
                 {
                     std = data;
                 }
+
             }
             return View(std);
         }
 
         [HttpPost, ActionName("Delete")]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public IActionResult DeleteConfirmed(int id)
         {
-            HttpResponseMessage response = await client.DeleteAsync(url + id);
+           
+            HttpResponseMessage response = client.DeleteAsync(url + id).Result;
             if (response.IsSuccessStatusCode)
             {
                 TempData["delete_message"] = "Student deleted successfully.";
                 return RedirectToAction("Index");
+
             }
             return View();
         }
     }
 }
+                 
