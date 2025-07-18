@@ -1,0 +1,25 @@
+# .NET Core
+bin/
+obj/
+*.csproj.user
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# ASP.NET Core
+appsettings.json
+appsettings.*.json
+*.log
+wwwroot/
+
+# Visual Studio
+.vs/
+*.ncb
+*.sdf
+*.cache
+
+# NuGet Packages
+packages/
+*.nupkg
+!packages/*.nupkg
